@@ -24,7 +24,7 @@ $config = [
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'error/index',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -32,6 +32,9 @@ $config = [
             // 'useFileTransport' to false and configure a transport
             // for the mailer to send real emails.
             'useFileTransport' => true,
+        ],
+        'urlManager' => [
+	        'enablePrettyUrl' => true,
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

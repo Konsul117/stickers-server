@@ -2,9 +2,21 @@
 
 namespace app\controllers;
 
+use app\components\ApiController;
+use app\enum\ResponseCodeEnum;
 
-use yii\rest\ActiveController;
+/**
+ * Контроллер тикетов.
+ */
+class TicketController extends ApiController {
 
-class TicketController extends ActiveController {
-
+	/**
+	 * Получение тикета.
+	 *
+	 * @param string $id Идентификатор
+	 */
+	public function actionGet(string $id) {
+		$this->response->code = ResponseCodeEnum::CODE_OK;
+		$this->response->data = 'test';
+	}
 }
