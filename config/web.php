@@ -1,5 +1,8 @@
 <?php
 
+use yii\rest\UrlRule;
+use yii\web\JsonParser;
+
 $params = require __DIR__ . '/params.php';
 $db     = require __DIR__ . '/db.php';
 
@@ -13,8 +16,9 @@ $config = [
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'lpcB8168UsA_qey-eO22fE7wSYFVWXZO',
+            'parsers' => [
+	            'application/json' => JsonParser::class,
+            ]
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -34,7 +38,12 @@ $config = [
             'useFileTransport' => true,
         ],
         'urlManager' => [
-	        'enablePrettyUrl' => true,
+	        'enablePrettyUrl'     => true,
+	        'enableStrictParsing' => true,
+	        'showScriptName'      => false,
+	        'rules'               => [
+		        ['class' => UrlRule::class, 'controller' => 'ticket', 'pluralize' => false, 'suffix' => '/'],
+	        ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
