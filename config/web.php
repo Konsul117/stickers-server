@@ -18,7 +18,8 @@ $config = [
         'request' => [
             'parsers' => [
 	            'application/json' => JsonParser::class,
-            ]
+            ],
+            'cookieValidationKey' => 'DSFgksdifhiw899734hekfDFGisjdfi9374',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -42,7 +43,15 @@ $config = [
 	        'enableStrictParsing' => true,
 	        'showScriptName'      => false,
 	        'rules'               => [
-		        ['class' => UrlRule::class, 'controller' => 'ticket', 'pluralize' => false, 'suffix' => '/'],
+		        [
+		        	'class' => UrlRule::class,
+			        'controller' => 'ticket',
+			        'pluralize' => false,
+//			        'suffix' => '/',
+			        'extraPatterns' => [
+				        'batch' => 'batch',
+			        ],
+			    ],
 	        ],
         ],
         'log' => [

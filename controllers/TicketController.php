@@ -2,10 +2,16 @@
 
 namespace app\controllers;
 
+use app\models\ApiResponse;
 use app\models\db\Sticker;
+use http\Exception\InvalidArgumentException;
+use Yii;
 use yii\filters\ContentNegotiator;
+use yii\helpers\ArrayHelper;
 use yii\rest\ActiveController;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Контроллер тикетов.
@@ -25,20 +31,74 @@ class TicketController extends ActiveController {
 					'application/json' => Response::FORMAT_JSON,
 				],
 			],
+			[
+				'class' => \yii\filters\Cors::class,
+			],
 		]);
 	}
 
-	public function verbs() {
-		return [];
-	}
+//	public function actions() {
+//		return array_merge(parent::actions(), [
+//			'delete' => [
+//				'class' => 'yii\rest\ViewAction',
+//			],
+//		])
+//	}
 
 	/**
-	 * Получение тикета.
+	 * Обновление пачки тикетов.
 	 *
-	 * @param string $id Идентификатор
+	 * @return ApiResponse
+	 *
+	 * @throws BadRequestHttpException
+	 * @throws \Throwable
+	 * @throws \yii\db\Exception
 	 */
-//	public function actionGet(string $id) {
-//		$this->response->code = ResponseCodeEnum::CODE_OK;
-//		$this->response->data = 'test';
-//	}
+	public function actionBatch() {
+		if (!is_array(Yii::$app->request->post())) {
+			throw new BadRequestHttpException();
+		}
+
+		/** @var Sticker[] $inputModels */
+		$inputModels = [];
+		foreach (Yii::$app->request->post() as $item) {
+			$model = new Sticker();
+
+			if (!$model->load($item, '') || !$model->validate()) {
+				throw new BadRequestHttpException('Invalid ticket: ' . var_export($model->errors, true));
+			}
+
+			$inputModels[$model->id] = $model;
+		}
+
+		/** @var Sticker[] $storedModels */
+		$storedModels = Sticker::findAll([
+			Sticker::ATTR_ID => array_keys($inputModels),
+		]);
+
+		$storedModels = ArrayHelper::index($storedModels, Sticker::ATTR_ID);
+
+		$nonExistentModelsIds = array_diff(array_keys($inputModels), array_keys($storedModels));
+		if (!empty($nonExistentModelsIds)) {
+			throw new BadRequestHttpException('Non existent stickers: ' . implode($nonExistentModelsIds));
+		}
+
+		$transaction = Yii::$app->db->beginTransaction();
+		try {
+			foreach ($inputModels as $inputModel) {
+				$storedModel = $storedModels[$inputModel->id];
+				$storedModel->attributes = $inputModel->attributes;
+				if (!$storedModel->save()) {
+					throw new ServerErrorHttpException('Error while saving ticket');
+				}
+			}
+		} catch (\Throwable $e) {
+			$transaction->rollBack();
+			throw $e;
+		}
+
+		$transaction->commit();
+
+		return new ApiResponse();
+	}
 }
