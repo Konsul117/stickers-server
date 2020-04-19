@@ -4,9 +4,12 @@ namespace app\controllers;
 
 use app\models\ApiResponse;
 use app\models\db\Sticker;
-use http\Exception\InvalidArgumentException;
+use Exception;
 use Yii;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
+use yii\filters\Cors;
 use yii\helpers\ArrayHelper;
 use yii\rest\ActiveController;
 use yii\web\BadRequestHttpException;
@@ -32,18 +35,16 @@ class TicketController extends ActiveController {
 				],
 			],
 			[
-				'class' => \yii\filters\Cors::class,
+				'class' => Cors::class,
 			],
+            [
+                'class'       => CompositeAuth::class,
+                'authMethods' => [
+                    HttpBearerAuth::class,
+                ],
+            ],
 		]);
 	}
-
-//	public function actions() {
-//		return array_merge(parent::actions(), [
-//			'delete' => [
-//				'class' => 'yii\rest\ViewAction',
-//			],
-//		])
-//	}
 
 	/**
 	 * Обновление пачки тикетов.
@@ -92,7 +93,7 @@ class TicketController extends ActiveController {
 					throw new ServerErrorHttpException('Error while saving ticket');
 				}
 			}
-		} catch (\Throwable $e) {
+		} catch (Exception $e) {
 			$transaction->rollBack();
 			throw $e;
 		}

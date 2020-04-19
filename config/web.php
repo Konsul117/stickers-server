@@ -1,5 +1,6 @@
 <?php
 
+use app\models\db\User;
 use yii\rest\UrlRule;
 use yii\web\JsonParser;
 
@@ -25,8 +26,9 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass'   => User::class,
             'enableAutoLogin' => true,
+            'enableSession'   => false,
         ],
         'errorHandler' => [
             'errorAction' => 'error/index',
@@ -44,14 +46,22 @@ $config = [
 	        'showScriptName'      => false,
 	        'rules'               => [
 		        [
-		        	'class' => UrlRule::class,
-			        'controller' => 'ticket',
-			        'pluralize' => false,
-//			        'suffix' => '/',
-			        'extraPatterns' => [
-				        'batch' => 'batch',
-			        ],
+                    'class'         => UrlRule::class,
+                    'controller'    => 'ticket',
+                    'pluralize'     => false,
+                    'extraPatterns' => [
+                        'batch' => 'batch',
+                    ],
 			    ],
+                [
+                    'class'         => UrlRule::class,
+                    'controller'    => 'auth',
+                    'pluralize'     => false,
+                    'extraPatterns' => [
+                        'login'  => 'login',
+                        'status' => 'status',//@TODO-19.04.2020-Kazancev A. что-то придумать с этим, чтобы не перечислять кастомные экшны
+                    ],
+                ],
 	        ],
         ],
         'log' => [
@@ -64,6 +74,16 @@ $config = [
             ],
         ],
         'db' => $db,
+    ],
+    'container' => [
+        'singletons' => [
+            \yii\web\User::class => [
+                'class'           => \yii\web\User::class,
+                'identityClass'   => User::class,
+                'enableAutoLogin' => true,
+                'enableSession'   => false,
+            ],
+        ],
     ],
     'params' => $params,
 ];
