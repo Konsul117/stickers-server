@@ -6,12 +6,14 @@ use app\models\ApiResponse;
 use app\models\db\Sticker;
 use Exception;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
 use yii\filters\Cors;
 use yii\helpers\ArrayHelper;
 use yii\rest\ActiveController;
+use yii\rest\IndexAction;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
@@ -45,6 +47,27 @@ class TicketController extends ActiveController {
             ],
 		]);
 	}
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return array_merge(parent::actions(), [
+            'index' => [
+                'class'       => IndexAction::class,
+                'modelClass'  => $this->modelClass,
+                'checkAccess' => [$this, 'checkAccess'],
+                'prepareDataProvider' => function () {
+                    $result = new ActiveDataProvider();
+                    $result->query = Sticker::find()
+                        ->where([Sticker::ATTR_AUTHOR_ID => Yii::$app->user->id]);
+
+                    return $result;
+                },
+            ],
+        ]);
+    }
 
 	/**
 	 * Обновление пачки тикетов.

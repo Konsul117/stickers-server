@@ -2,33 +2,43 @@
 
 namespace app\models\db;
 
+use app\components\behaviors\UserBehavior;
 use app\components\validators\FilterClearTextValidator;
 use app\components\validators\IntegerValidator;
 use app\components\validators\PositiveIntegerValidator;
 use yii\db\ActiveRecord;
-use yii\validators\BooleanValidator;
-use yii\validators\DefaultValueValidator;
 use yii\validators\RequiredValidator;
 
 /**
  * Стикер.
  *
- * @property int    $id     Идентификатор
- * @property int    $index  Индекс сортировки
- * @property string $text   Текст
+ * @property int    $id        Идентификатор
+ * @property int    $index     Индекс сортировки
+ * @property string $text      Текст
+ * @property int    $author_id Автор
  *
  * @author Казанцев Александр <kazancev.al@dns-shop.ru>
  */
 class Sticker extends ActiveRecord {
 
-	const ATTR_ID     = 'id';
-	const ATTR_INDEX  = 'index';
-	const ATTR_TEXT   = 'text';
+    const ATTR_ID        = 'id';
+    const ATTR_INDEX     = 'index';
+    const ATTR_TEXT      = 'text';
+    const ATTR_AUTHOR_ID = 'author_id';
 
-	/**
+    public function behaviors()
+    {
+        return [
+            [
+                'class'                                 => UserBehavior::class,
+                UserBehavior::ATTR_CREATED_BY_ATTRIBUTE => static::ATTR_AUTHOR_ID,
+                UserBehavior::ATTR_UPDATED_BY_ATTRIBUTE => null,
+            ],
+        ];
+    }
+
+    /**
 	 * @inheritdoc
-	 *
-	 * @author Казанцев Александр <kazancev.al@dns-shop.ru>
 	 */
 	public function rules(): array {
 		return [
