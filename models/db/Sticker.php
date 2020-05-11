@@ -16,6 +16,7 @@ use yii\validators\RequiredValidator;
  * @property int    $index     Индекс сортировки
  * @property string $text      Текст
  * @property int    $author_id Автор
+ * @property int    $board_id  Доска
  *
  * @author Казанцев Александр <kazancev.al@dns-shop.ru>
  */
@@ -25,6 +26,7 @@ class Sticker extends ActiveRecord {
     const ATTR_INDEX     = 'index';
     const ATTR_TEXT      = 'text';
     const ATTR_AUTHOR_ID = 'author_id';
+    const ATTR_BOARD_ID  = 'board_id';
 
     public function behaviors()
     {
@@ -42,11 +44,13 @@ class Sticker extends ActiveRecord {
 	 */
 	public function rules(): array {
 		return [
-			[static::ATTR_ID,     PositiveIntegerValidator::class],
-			[static::ATTR_INDEX,  RequiredValidator::class],
-			[static::ATTR_INDEX,  IntegerValidator::class],
-			[static::ATTR_TEXT,   RequiredValidator::class],
-			[static::ATTR_TEXT,   FilterClearTextValidator::class],
+			[static::ATTR_ID,       PositiveIntegerValidator::class],
+			[static::ATTR_INDEX,    RequiredValidator::class],
+			[static::ATTR_INDEX,    IntegerValidator::class],
+			[static::ATTR_TEXT,     RequiredValidator::class],
+			[static::ATTR_TEXT,     FilterClearTextValidator::class],
+            [static::ATTR_BOARD_ID, RequiredValidator::class],
+            [static::ATTR_BOARD_ID, PositiveIntegerValidator::class],
 		];
 	}
 }

@@ -45,6 +45,14 @@ $config = [
 	        'enableStrictParsing' => true,
 	        'showScriptName'      => false,
 	        'rules'               => [
+                [
+                    'class'         => UrlRule::class,
+                    'controller'    => 'board',
+                    'pluralize'     => false,
+                    'extraPatterns' => [
+                        'batch' => 'batch',
+                    ],
+                ],
 		        [
                     'class'         => UrlRule::class,
                     'controller'    => 'ticket',
