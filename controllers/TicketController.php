@@ -152,5 +152,11 @@ class TicketController extends BaseController {
                 throw new ForbiddenHttpException('Указанная доска не существует или недоступна.');
             }
         }
+
+        if ($action === 'delete') {
+            if ($model->author_id !== Yii::$app->user->id) {
+                throw new ForbiddenHttpException('Указанная доска не существует или недоступна.');
+            }
+        }
     }
 }
