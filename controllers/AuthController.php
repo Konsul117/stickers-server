@@ -9,9 +9,12 @@ use app\models\dto\auth\UserFront;
 use Yii;
 use yii\base\Security;
 use yii\filters\AccessControl;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
 use yii\filters\Cors;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
@@ -36,7 +39,7 @@ class AuthController extends Controller
      * {@inheritdoc}
      */
     public function behaviors() {
-        return array_merge(parent::behaviors(), [
+        return ArrayHelper::merge(parent::behaviors(), [
             'contentNegotiator' => [
                 'class'   => ContentNegotiator::class,
                 'formats' => [
@@ -47,17 +50,26 @@ class AuthController extends Controller
                 'class' => Cors::class,
             ],
             [
+                'class'       => CompositeAuth::class,
+                'authMethods' => [
+                    HttpBearerAuth::class,
+                ],
+                'optional' => [
+                    'login',
+                ],
+            ],
+            [
                 'class' => AccessControl::class,
                 'only'  => ['login', 'logout', 'status'],
                 'rules' => [
                     [
                         'allow'   => true,
-                        'actions' => ['login', 'status'],
+                        'actions' => ['login'],
                         'roles'   => ['?'],
                     ],
                     [
                         'allow'   => true,
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'status'],
                         'roles'   => ['@'],
                     ],
                 ],
@@ -65,8 +77,9 @@ class AuthController extends Controller
             [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    static::ACTION_LOGIN => ['post'],
-                    static::ACTION_TOKEN => ['get'],
+                    static::ACTION_LOGIN  => ['post'],
+                    static::ACTION_LOGOUT => ['post'],
+                    static::ACTION_TOKEN  => ['get'],
                 ],
             ]
         ]);
@@ -127,6 +140,19 @@ class AuthController extends Controller
         return $response;
     }
     const ACTION_TOKEN = 'token';
+
+    public function actionLogout()
+    {
+        /** @var User $user */
+        $user = $this->userService->getIdentity();
+        $user->auth_key = '';
+        if ($user->save() === false) {
+            throw new ServerErrorHttpException();
+        }
+
+        $this->userService->logout();
+    }
+    const ACTION_LOGOUT = 'logout';
 
     private function convertUserToFront(User $model): UserFront
     {

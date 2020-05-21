@@ -67,6 +67,7 @@ $config = [
                     'pluralize'     => false,
                     'extraPatterns' => [
                         'login'  => 'login',
+                        'logout' => 'logout',
                         'status' => 'status',//@TODO-19.04.2020-Kazancev A. что-то придумать с этим, чтобы не перечислять кастомные экшны
                     ],
                 ],
