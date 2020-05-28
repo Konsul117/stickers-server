@@ -1,5 +1,6 @@
 <?php
 
+use app\models\db\User;
 use yii\rest\UrlRule;
 use yii\web\JsonParser;
 
@@ -18,14 +19,16 @@ $config = [
         'request' => [
             'parsers' => [
 	            'application/json' => JsonParser::class,
-            ]
+            ],
+            'cookieValidationKey' => 'DSFgksdifhiw899734hekfDFGisjdfi9374',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass'   => User::class,
             'enableAutoLogin' => true,
+            'enableSession'   => false,
         ],
         'errorHandler' => [
             'errorAction' => 'error/index',
@@ -42,7 +45,32 @@ $config = [
 	        'enableStrictParsing' => true,
 	        'showScriptName'      => false,
 	        'rules'               => [
-		        ['class' => UrlRule::class, 'controller' => 'ticket', 'pluralize' => false, 'suffix' => '/'],
+                [
+                    'class'         => UrlRule::class,
+                    'controller'    => 'board',
+                    'pluralize'     => false,
+                    'extraPatterns' => [
+                        'batch' => 'batch',
+                    ],
+                ],
+		        [
+                    'class'         => UrlRule::class,
+                    'controller'    => 'ticket',
+                    'pluralize'     => false,
+                    'extraPatterns' => [
+                        'batch' => 'batch',
+                    ],
+			    ],
+                [
+                    'class'         => UrlRule::class,
+                    'controller'    => 'auth',
+                    'pluralize'     => false,
+                    'extraPatterns' => [
+                        'login'  => 'login',
+                        'logout' => 'logout',
+                        'status' => 'status',//@TODO-19.04.2020-Kazancev A. что-то придумать с этим, чтобы не перечислять кастомные экшны
+                    ],
+                ],
 	        ],
         ],
         'log' => [
@@ -55,6 +83,16 @@ $config = [
             ],
         ],
         'db' => $db,
+    ],
+    'container' => [
+        'singletons' => [
+            \yii\web\User::class => [
+                'class'           => \yii\web\User::class,
+                'identityClass'   => User::class,
+                'enableAutoLogin' => true,
+                'enableSession'   => false,
+            ],
+        ],
     ],
     'params' => $params,
 ];

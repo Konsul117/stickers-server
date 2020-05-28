@@ -15,7 +15,6 @@ class m190309_072622_sticker extends Migration {
 			'id'     => $this->primaryKey() . ' COMMENT "Идентификатор"',
 			'index'  => 'INT NOT NULL COMMENT "Индекс сортировки"',
 			'text'   => 'TEXT NOT NULL COMMENT "Текст"',
-			'is_new' => 'TINYINT NOT NULL COMMENT "Новый стикер"',
 		], 'COMMENT "Стикер"');
 	}
 
