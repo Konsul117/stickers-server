@@ -1,6 +1,5 @@
 <?php
 
-use app\models\db\User;
 use yii\rest\UrlRule;
 use yii\web\JsonParser;
 
@@ -24,11 +23,6 @@ $config = [
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
-        ],
-        'user' => [
-            'identityClass'   => User::class,
-            'enableAutoLogin' => true,
-            'enableSession'   => false,
         ],
         'errorHandler' => [
             'errorAction' => 'error/index',
@@ -83,16 +77,6 @@ $config = [
             ],
         ],
         'db' => $db,
-    ],
-    'container' => [
-        'singletons' => [
-            \yii\web\User::class => [
-                'class'           => \yii\web\User::class,
-                'identityClass'   => User::class,
-                'enableAutoLogin' => true,
-                'enableSession'   => false,
-            ],
-        ],
     ],
     'params' => $params,
 ];

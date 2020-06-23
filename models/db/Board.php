@@ -30,6 +30,7 @@ class Board extends ActiveRecord
                 'class'                                 => UserBehavior::class,
                 UserBehavior::ATTR_CREATED_BY_ATTRIBUTE => static::ATTR_AUTHOR_ID,
                 UserBehavior::ATTR_UPDATED_BY_ATTRIBUTE => null,
+                'preserveNonEmptyValues'                => true,
             ],
         ];
     }
